@@ -8,8 +8,12 @@ services:
       - internal_network
     healthcheck:
       test: ['CMD', 'pg-isready', '-U', 'postgres']
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 5s
     volumes:
-      - ./postgres16:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
     ports:
       - 5432:5432
     environment:
@@ -22,7 +26,6 @@ services:
     container_name: backend
     build: .
     restart: always
-    env_file: .env
     networks:
       - internal_network
       - external_network
@@ -35,3 +38,6 @@ networks:
   external_network:
   internal_network:
     internal: true
+
+volumes:
+  postgres_data:
