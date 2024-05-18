@@ -26,6 +26,10 @@ services:
     container_name: backend
     build: .
     restart: always
+    volumes:
+      - ./dashboard:/dashboard
+    environment:
+      - DJANGO_SETTINGS_MODULE=dashboard.settings
     networks:
       - internal_network
       - external_network
