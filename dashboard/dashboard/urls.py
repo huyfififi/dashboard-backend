@@ -19,6 +19,6 @@ from django.urls import include, path
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("", include("codeforces.urls")),
+    path("api/v1/codeforces/", include("codeforces.urls")),
     path('api-auth/', include('rest_framework.urls')),
 ]
