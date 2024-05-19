@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('last_updated', models.DateTimeField(auto_now=True)),
-                ('handle', models.CharField(editable=False, max_length=50, unique=True)),
+                ('handle', models.CharField(max_length=50, unique=True)),
                 ('rating', models.IntegerField(blank=True, null=True)),
                 ('max_rating', models.IntegerField(blank=True, null=True)),
             ],
