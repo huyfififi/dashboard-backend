@@ -59,3 +59,4 @@ class TestCodeforcesUserAPI:
         assert response_payload["handle"] == handle
         assert isinstance(response_payload["rating"], int)
         assert isinstance(response_payload["max_rating"], int)
+        assert response_payload["last_updated"] is not None
