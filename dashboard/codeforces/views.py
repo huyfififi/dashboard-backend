@@ -1,6 +1,9 @@
+from datetime import timedelta
 from typing import Optional
 
 import httpx
+from django.conf import settings
+from django.utils import timezone
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -31,10 +34,11 @@ def create_codeforces_user(handle: str) -> Optional[CodeforcesUser]:
 
 @api_view(["GET"])
 def user_info(request):
-    handle = request.query_params.get("handle")
+    handle = settings.CODEFORCES_HANDLE
     if not handle:
         return Response(
-            {"error": "handle is required"}, status=status.HTTP_400_BAD_REQUEST
+            {"error": "handle is not set in the server"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
     try:
@@ -43,11 +47,12 @@ def user_info(request):
         user = create_codeforces_user(handle=handle)
         if not user:
             return Response(
-                {"error": "server error occurred while retrieving user information"}
+                {"error": "server error occurred while retrieving user information"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
-    # curr tiem -  user.last_updated > 1 hour
-    # update user information
+    if timezone.now() - user.last_updated > timedelta(hours=1):
+        user = update_codeforces_user(handle=handle)
 
     serializer = CodeforcesUserSerializer(instance=user)
     return Response(data=serializer.data, status=status.HTTP_200_OK)
