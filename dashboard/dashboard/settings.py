@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     # Third-party
+    "django_celery_beat",
     "django_extensions",
     "rest_framework",
     # Apps
@@ -85,7 +86,7 @@ DATABASES = {
         'NAME': "postgres",
         'USER': "postgres",
         'PASSWORD': "postgres",
-        'HOST': os.getenv("DATABASE_HOST", "db"),
+        'HOST': os.getenv("DATABASE_HOST", "database"),
         'PORT': "5432",
     }
 }
@@ -131,5 +132,8 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+CELERY_BROKER_URL = "redis://:redis@message-queue:6379/0"
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 
 CODEFORCES_HANDLE = "utsu_boy"
