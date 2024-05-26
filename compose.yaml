@@ -7,10 +7,9 @@ services:
     networks:
       - internal_network
     healthcheck:
-      test: ['CMD', 'pg-isready', '-U', 'postgres']
-      interval: 10s
-      retries: 5
-      start_period: 30s
+      test: ['CMD', 'pg_isready', '-U', 'postgres']
+      interval: 1s
+      retries: 10
       timeout: 5s
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -26,6 +25,7 @@ services:
     container_name: message-queue
     image: redis:7-alpine
     command: redis-server --requirepass redis --appendonly yes
+    # TODO: healthcheck:
     volumes:
       - redis_data:/data
     ports:
@@ -47,8 +47,11 @@ services:
     ports:
       - 8000:8000
     depends_on:
-      - database
-      - message-queue
+      database:
+        condition: service_healthy
+      message-queue:
+        # TODO: condition: service_healthy
+        condition: service_started
 
   worker:
     container_name: worker
@@ -63,8 +66,11 @@ services:
     volumes:
       - ./dashboard:/app
     depends_on:
-      - database
-      - message-queue
+      database:
+        condition: service_healthy
+      message-queue:
+        # TODO: condition: service_healthy
+        condition: service_started
     networks:
       - internal_network
 
@@ -84,8 +90,11 @@ services:
     volumes:
       - ./dashboard:/app
     depends_on:
-      - database
-      - message-queue
+      database:
+        condition: service_healthy
+      message-queue:
+        # TODO: condition: service_healthy
+        condition: service_started
     networks:
       - internal_network
 
