@@ -4,6 +4,7 @@ import httpx
 from celery import shared_task
 from django.conf import settings
 
+from .models import CodeforcesUser
 from .serializers import CodeforcesUserSerializer
 
 
@@ -20,7 +21,8 @@ def retrieve_codeforces_user_info(handle: str = settings.CODEFORCES_HANDLE) -> N
             "handle": handle,
             "rating": user_info["rating"],
             "max_rating": user_info["maxRating"],
-        }
+        },
+        instance=CodeforcesUser.objects.filter(handle=handle).first(),
     )
     if not serializer.is_valid():
         logging.error(f"failed to serialize codeforces user info: {serializer.errors=}")
