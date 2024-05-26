@@ -96,6 +96,8 @@ services:
       message-queue:
         # TODO: condition: service_healthy
         condition: service_started
+      # TODO: backend:
+      # TODO:   condition: service_healthy
     networks:
       - internal_network
 
