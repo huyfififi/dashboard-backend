@@ -40,16 +40,29 @@ class TestCodeforcesUserAPI:
     def client(self):
         return APIClient()
 
-    def test_handle_is_required(self, client, settings):
+    def test_handle_in_setting_is_required(self, client, settings):
         settings.CODEFORCES_HANDLE = None
         response = client.get(reverse("codeforces-user-info"))
         assert response.status_code == 500
         assert response.json() == {
             "error": (
-                "user record was not found. "
-                "that might be due to misconfiguration."
+                "user record was not found. " "that might be due to misconfiguration."
             )
         }
 
-    def test_retrieve_user_info(self, client):
-        pass
+    def test_retrieve_user_info(self, client, mocker, settings):
+        settings.CODEFORCES_HANDLE = "dotted_seal"
+
+        CodeforcesUser.objects.create(
+            handle="dotted_seal",
+            rating=1000,
+            max_rating=1050,
+        )
+        response = client.get(reverse("codeforces-user-info"))
+        assert response.status_code == 200
+        assert response.json() == {
+            "handle": "dotted_seal",
+            "rating": 1000,
+            "max_rating": 1050,
+            "last_updated": mocker.ANY,
+        }
