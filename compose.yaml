@@ -72,6 +72,7 @@ services:
         # TODO: condition: service_healthy
         condition: service_started
     networks:
+      - external_network
       - internal_network
 
   scheduler:
