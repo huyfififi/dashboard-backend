@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 import os
 from pathlib import Path
 
+from celery.schedules import crontab
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -133,7 +135,15 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# CELERY_* configurations will be translated by app.config_from_object()
 CELERY_BROKER_URL = "redis://:redis@message-queue:6379/0"
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+# https://docs.celeryq.dev/en/stable/userguide/configuration.html#beat-schedule
+CELERY_BEAT_SCHEDULE = {
+    "debug_task": {
+        "task": "dashboard.celery.debug_task",
+        "schedule": crontab(),
+    }
+}
 
 CODEFORCES_HANDLE = "utsu_boy"

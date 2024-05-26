@@ -26,6 +26,8 @@ services:
     container_name: message-queue
     image: redis:7-alpine
     command: redis-server --requirepass redis --appendonly yes
+    volumes:
+      - redis_data:/data
     ports:
       - 6379:6379
     networks:
@@ -56,9 +58,7 @@ services:
       "-A",
       "dashboard",
       "worker",
-      "-Q",
-      "default-queue",
-      "--loglevel=INFO"
+      "--loglevel=info"
     ]
     volumes:
       - ./dashboard:/app
@@ -76,8 +76,10 @@ services:
       "-A",
       "dashboard",
       "beat",
-      "--loglevel=INFO",
-      "--scheduler=django_celery_beat.schedulers:DatabaseScheduler"
+      "-l",
+      "info",
+      "--scheduler",
+      "django_celery_beat.schedulers:DatabaseScheduler"
     ]
     volumes:
       - ./dashboard:/app
@@ -94,3 +96,4 @@ networks:
 
 volumes:
   postgres_data:
+  redis_data:
