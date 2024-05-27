@@ -140,15 +140,16 @@ CELERY_BROKER_URL = "redis://:redis@message-queue:6379/0"
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 # https://docs.celeryq.dev/en/stable/userguide/configuration.html#beat-schedule
 CELERY_BEAT_SCHEDULE = {
-    # "task_1": {
-    #     "task": "dashboard.celery.debug_task",
-    #     "schedule": crontab(minute="*/1"),
-    # },
-    "task_2": {
+    # task_1 and task_2 should not be run at the same time
+    # because they both fetch data from codeforces
+    "task_1": {
         "task": "codeforces.tasks.retrieve_codeforces_user_info",
-        # "schedule": crontab(minute=0, hour="*/6")
-        "schedule": crontab(minute="*/5"),
-    }
+        "schedule": crontab(minute=30, hour="*/6"),
+    },
+    "task_2": {
+        "task": "codeforces.tasks.retrieve_codeforces_submissions",
+        "schedule": crontab(minute=0, hour="*/1"),
+    },
 }
 
 CODEFORCES_HANDLE = "utsu_boy"
