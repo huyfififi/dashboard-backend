@@ -1,9 +1,10 @@
 import pytest
+from django.core.exceptions import ValidationError
 from django.db.utils import IntegrityError
 from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
 
-from codeforces.models import CodeforcesUser
+from codeforces.models import CodeforcesUser, CodeforcesSubmission
 
 
 @pytest.mark.django_db
@@ -32,6 +33,50 @@ class TestCodeforcesUserModel:
         user = CodeforcesUser.objects.create(handle="new_handle")
         assert user.rating is None
         assert user.max_rating is None
+
+
+@pytest.mark.django_db
+class TestCodeforcesSubmissionModel:
+    def test_submission_creation(self):
+        user = CodeforcesUser.objects.create(
+            handle="test_handle", rating=1500, max_rating=1600
+        )
+        submission: CodeforcesSubmission = user.codeforcessubmission_set.create(
+            contest_id=1,
+            problem_index="A",
+            programming_language="Python",
+            submission_id=1,
+            verdict="AC",
+        )
+        assert submission.contest_id == 1
+        assert submission.problem_index == "A"
+        assert submission.programming_language == "Python"
+        assert submission.submission_id == 1
+        assert submission.verdict == "AC"
+
+    def test_verdict_choices(self):
+        user = CodeforcesUser.objects.create(
+            handle="test_handle", rating=1500, max_rating=1600
+        )
+        submission: CodeforcesSubmission = user.codeforcessubmission_set.create(
+            contest_id=1,
+            problem_index="A",
+            programming_language="Python",
+            submission_id=1,
+            verdict="WA",
+        )
+        assert submission.verdict == "WA"
+
+        submission.verdict = "AC"  # valid choice 
+        submission.full_clean()
+        submission.save()
+
+        submission.verdict = "AAA"  # not a valid choice
+        submission.save()  # choices are not enforced at the database level
+
+        with pytest.raises(ValidationError):
+            submission.full_clean()
+            submission.save()
 
 
 @pytest.mark.django_db
