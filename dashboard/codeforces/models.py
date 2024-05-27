@@ -41,3 +41,6 @@ class CodeforcesSubmission(models.Model):
         blank=True,
         null=True,
     )  # can be absent
+
+    class Meta:
+        ordering = ["-submission_id"]

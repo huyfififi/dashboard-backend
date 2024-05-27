@@ -34,7 +34,9 @@ def retrieve_codeforces_user_info(handle: str = settings.CODEFORCES_HANDLE) -> N
 
 
 @shared_task
-def retrieve_codeforces_submissions(handle: str = settings.CODEFORCES_HANDLE) -> None:
+def retrieve_codeforces_user_submissions(
+    handle: str = settings.CODEFORCES_HANDLE,
+) -> None:
     BATCH_SIZE = 100
 
     try:
@@ -51,7 +53,7 @@ def retrieve_codeforces_submissions(handle: str = settings.CODEFORCES_HANDLE) ->
         logging.info(f"fetching submissions for {handle} page: {page_i}")
         response = httpx.get(
             "https://codeforces.com/api/user.status?"
-            f"handle={handle}&from={page_i * BATCH_SIZE}&count={BATCH_SIZE}"
+            f"handle={handle}&from={page_i * BATCH_SIZE + 1}&count={BATCH_SIZE}"
         )
         if response.status_code != 200:
             logging.error(
@@ -76,7 +78,7 @@ def retrieve_codeforces_submissions(handle: str = settings.CODEFORCES_HANDLE) ->
                     problem_index=submission["problem"]["index"],
                     programming_language=submission["programmingLanguage"],
                     submission_id=submission["id"],
-                    verdict=submission["verdict"],
+                    verdict=CodeforcesSubmission.VERDICT_CHOICES[submission["verdict"]],
                     user=user,
                 )
             )

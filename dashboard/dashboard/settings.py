@@ -83,13 +83,13 @@ WSGI_APPLICATION = "dashboard.wsgi.application"
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 # TODO: Replace hard-coded values with env
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': "postgres",
-        'USER': "postgres",
-        'PASSWORD': "postgres",
-        'HOST': os.getenv("DATABASE_HOST", "database"),
-        'PORT': "5432",
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "postgres",
+        "USER": "postgres",
+        "PASSWORD": "postgres",
+        "HOST": os.getenv("DATABASE_HOST", "database"),
+        "PORT": "5432",
     }
 }
 
@@ -147,7 +147,7 @@ CELERY_BEAT_SCHEDULE = {
         "schedule": crontab(minute=30, hour="*/6"),
     },
     "task_2": {
-        "task": "codeforces.tasks.retrieve_codeforces_submissions",
+        "task": "codeforces.tasks.retrieve_codeforces_user_submissions",
         "schedule": crontab(minute=0, hour="*/1"),
     },
 }
