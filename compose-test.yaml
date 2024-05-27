@@ -1,0 +1,49 @@
+# This compose file is intended to run backend tests in local
+services:
+  database:
+    container_name: database
+    restart: always
+    image: postgres:16-alpine
+    shm_size: 256mb
+    networks:
+      - internal_network
+    healthcheck:
+      test: ['CMD', 'pg_isready', '-U', 'postgres']
+      interval: 1s
+      retries: 10
+      timeout: 5s
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    environment:
+      # TODO: Use env
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+
+  backend:
+    container_name: backend
+    build: .
+    restart: always
+    volumes:
+      - ./dashboard:/dashboard
+    environment:
+      - DJANGO_SETTINGS_MODULE=dashboard.settings
+    networks:
+      - internal_network
+      - external_network
+    ports:
+      - 8000:8000
+    depends_on:
+      database:
+        condition: service_healthy
+
+networks:
+  external_network:
+  internal_network:
+    internal: true
+
+volumes:
+  postgres_data:
+  redis_data:
