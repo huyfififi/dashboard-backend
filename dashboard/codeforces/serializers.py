@@ -5,7 +5,13 @@ from .models import CodeforcesUser, CodeforcesSubmission
 
 class CodeforcesUserSerializer(serializers.ModelSerializer):
     class Meta:
-        fields = ("handle", "rating", "max_rating", "last_updated")
+        fields = (
+            "handle",
+            "rating",
+            "max_rating",
+            "participated_contests_count",
+            "last_updated",
+        )
         model = CodeforcesUser
 
 
