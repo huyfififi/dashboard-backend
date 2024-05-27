@@ -11,17 +11,34 @@ from .serializers import CodeforcesUserSerializer
 
 @shared_task
 def retrieve_codeforces_user_info(handle: str = settings.CODEFORCES_HANDLE) -> None:
-    response = httpx.get(f"https://codeforces.com/api/user.info?handles={handle}")
+    request_url = f"https://codeforces.com/api/user.info?handles={handle}"
+    response = httpx.get(request_url)
     if response.status_code != 200:
-        logging.error(f"received an error response from codeforces: {response.text=}")
+        logging.error(
+            "received an error response from codeforces. ",
+            f"{response.text=} {request_url=}",
+        )
         return None
+    user_info: dict = response.json()["result"][0]
 
-    user_info = response.json()["result"][0]
+    time.sleep(3)
+
+    request_url = f"https://codeforces.com/api/user.rating?handle={handle}"
+    response = httpx.get(request_url)
+    if response.status_code != 200:
+        logging.error(
+            "received an error response from codeforces. ",
+            f"{response.text=} {request_url=}",
+        )
+        return None
+    participated_contests_count: int = len(response.json()["result"])
+
     serializer = CodeforcesUserSerializer(
         data={
             "handle": handle,
             "rating": user_info["rating"],
             "max_rating": user_info["maxRating"],
+            "participated_contests_count": participated_contests_count,
         },
         instance=CodeforcesUser.objects.filter(handle=handle).first(),
     )
