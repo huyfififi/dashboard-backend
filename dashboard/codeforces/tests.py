@@ -159,3 +159,64 @@ class TestCodeforcesUserAPI:
             "max_rating": 1050,
             "last_updated": mocker.ANY,
         }
+
+
+@pytest.mark.django_db
+class TestCodeforcesSubmissionAPI:
+    @pytest.fixture
+    def client(self):
+        return APIClient()
+
+    def test_handle_in_setting_is_required(self, client, settings):
+        settings.CODEFORCES_HANDLE = None
+        response = client.get(reverse("codeforces-user-statistics"))
+        assert response.status_code == 500
+        assert response.json() == {
+            "error": (
+                "user record was not found. " "that might be due to misconfiguration."
+            )
+        }
+
+    def test_retrieve_user_submissions_metrics(self, client, mocker, settings):
+        settings.CODEFORCES_HANDLE = "dotted_seal"
+
+        user = CodeforcesUser.objects.create(
+            handle="dotted_seal",
+            rating=1000,
+            max_rating=1050,
+        )
+        user.codeforcessubmission_set.create(
+            contest_id=1,
+            problem_index="A",
+            programming_language="Python",
+            submission_id=1,
+            verdict="AC",
+        )
+        user.codeforcessubmission_set.create(
+            contest_id=1,
+            problem_index="B",
+            programming_language="Python",
+            submission_id=2,
+            verdict="WA",
+        )
+        user.codeforcessubmission_set.create(
+            contest_id=2,
+            problem_index="A",
+            programming_language="Python",
+            submission_id=3,
+            verdict="AC",
+        )
+        user.codeforcessubmission_set.create(
+            contest_id=2,
+            problem_index="A",
+            programming_language="Python",
+            submission_id=4,
+            verdict="WA",
+        )
+
+        response = client.get(reverse("codeforces-user-statistics"))
+        assert response.status_code == 200
+        assert response.json() == {
+            "solved_count": 2,
+            "total_count": 4,
+        }
