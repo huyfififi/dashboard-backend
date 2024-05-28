@@ -9,12 +9,15 @@ from .models import CodeforcesUser, CodeforcesSubmission
 from .serializers import CodeforcesUserSerializer
 
 
+logger = logging.getLogger(__name__)
+
+
 @shared_task
 def retrieve_codeforces_user_info(handle: str = settings.CODEFORCES_HANDLE) -> None:
     request_url = f"https://codeforces.com/api/user.info?handles={handle}"
     response = httpx.get(request_url)
     if response.status_code != 200:
-        logging.error(
+        logger.error(
             "received an error response from codeforces. ",
             f"{response.text=} {request_url=}",
         )
@@ -26,7 +29,7 @@ def retrieve_codeforces_user_info(handle: str = settings.CODEFORCES_HANDLE) -> N
     request_url = f"https://codeforces.com/api/user.rating?handle={handle}"
     response = httpx.get(request_url)
     if response.status_code != 200:
-        logging.error(
+        logger.error(
             "received an error response from codeforces. ",
             f"{response.text=} {request_url=}",
         )
@@ -43,7 +46,7 @@ def retrieve_codeforces_user_info(handle: str = settings.CODEFORCES_HANDLE) -> N
         instance=CodeforcesUser.objects.filter(handle=handle).first(),
     )
     if not serializer.is_valid():
-        logging.error(f"failed to serialize codeforces user info: {serializer.errors=}")
+        logger.error(f"failed to serialize codeforces user info: {serializer.errors=}")
         return None
 
     serializer.save()
@@ -59,21 +62,24 @@ def retrieve_codeforces_user_submissions(
     try:
         user = CodeforcesUser.objects.get(handle=handle)
     except CodeforcesUser.DoesNotExist:
-        logging.error(
+        logger.error(
             f"user: {handle} record was not found. ",
             "that might be due to misconfiguration.",
         )
         return None
 
-    page_i = 0
-    while True:
-        logging.info(f"fetching submissions for {handle} page: {page_i}")
+    page_i: int = 0
+    up_to_date: bool = False
+    while not up_to_date:
+        logger.info(f"fetching submissions for {handle} page: {page_i}")
+        print(f"fetching submissions for {handle} page: {page_i}")
+        print(f"{up_to_date=}")
         response = httpx.get(
             "https://codeforces.com/api/user.status?"
             f"handle={handle}&from={page_i * BATCH_SIZE + 1}&count={BATCH_SIZE}"
         )
         if response.status_code != 200:
-            logging.error(
+            logger.error(
                 f"received an error response from codeforces: {response.text=}"
             )
             return None
@@ -87,6 +93,7 @@ def retrieve_codeforces_user_submissions(
             if CodeforcesSubmission.objects.filter(
                 submission_id=submission["id"]
             ).exists():
+                up_to_date = True
                 break
 
             submissions_to_create.append(
