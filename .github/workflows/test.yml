@@ -5,6 +5,9 @@ on: push
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      SECRET_KEY: ci-secret-key
+
     services:
       postgres:
         image: postgres:16-alpine

@@ -29,6 +29,7 @@ services:
     volumes:
       - ./dashboard:/dashboard
     environment:
+      - SECRET_KEY=test-secret-key
       - DJANGO_SETTINGS_MODULE=dashboard.settings
     networks:
       - internal_network
