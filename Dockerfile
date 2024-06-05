@@ -2,7 +2,7 @@ FROM python:3.12-slim
 
 RUN pip install -U pip
 
-WORKDIR /dashboard
+WORKDIR /app
 EXPOSE 8000
 
 COPY requirements.txt .

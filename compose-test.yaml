@@ -5,15 +5,13 @@ services:
     restart: always
     image: postgres:16-alpine
     shm_size: 256mb
-    networks:
-      - internal_network
     healthcheck:
       test: ['CMD', 'pg_isready', '-U', 'postgres']
-      interval: 1s
+      interval: 5s
       retries: 10
       timeout: 5s
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - db_data:/var/lib/postgresql/data
     ports:
       - 5432:5432
     environment:
@@ -27,24 +25,14 @@ services:
     build: .
     restart: always
     volumes:
-      - ./dashboard:/dashboard
+      - .:/app
     environment:
-      - SECRET_KEY=test-secret-key
-      - DJANGO_SETTINGS_MODULE=dashboard.settings
-    networks:
-      - internal_network
-      - external_network
+      - SECRET_KEY=local-test
     ports:
       - 8000:8000
     depends_on:
       database:
         condition: service_healthy
 
-networks:
-  external_network:
-  internal_network:
-    internal: true
-
 volumes:
-  postgres_data:
-  redis_data:
+  db_data:
