@@ -580,19 +580,6 @@ files = [
 Django = ">=3.2"
 
 [[package]]
-name = "django-rest-framework"
-version = "0.1.0"
-description = "alias."
-optional = false
-python-versions = "*"
-files = [
-    {file = "django-rest-framework-0.1.0.tar.gz", hash = "sha256:47a8f496fa69e3b6bd79f68dd7a1527d907d6b77f009e9db7cf9bb21cc565e4a"},
-]
-
-[package.dependencies]
-djangorestframework = "*"
-
-[[package]]
 name = "django-timezone-field"
 version = "6.1.0"
 description = "A Django app providing DB, form, and REST framework fields for zoneinfo and pytz timezone objects."
@@ -1732,4 +1719,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "a3a2a8ee392bedfbe49541843b3d33bbf8a95a7d181a6d0573d4895f76a27b8d"
+content-hash = "5ffc13fcc0ddeaa6e0f5fb3233421ff6ea0ef0c64dcbe2f05af2d0ae3be98028"
