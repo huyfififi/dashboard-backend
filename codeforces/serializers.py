@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import CodeforcesUser, CodeforcesSubmission
+from .models import CodeforcesUser
 
 
 class CodeforcesUserSerializer(serializers.ModelSerializer):
