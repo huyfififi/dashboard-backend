@@ -5,7 +5,6 @@ from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
 
 from codeforces.models import CodeforcesUser, CodeforcesSubmission
-from codeforces.serializers import CodeforcesSubmissionSerializer
 
 
 @pytest.mark.django_db
@@ -86,53 +85,6 @@ class TestCodeforcesSubmissionModel:
 
 
 @pytest.mark.django_db
-class TestCodeforcesSubmissionSerializer:
-    @pytest.fixture
-    def user(self):
-        return CodeforcesUser.objects.create(
-            handle="test_handle", rating=1500, max_rating=1600
-        )
-
-    @pytest.fixture
-    def submission_data(self, user):
-        return {
-            "contest_id": 1,
-            "problem_index": "A",
-            "programming_language": "Python",
-            "submission_id": 1,
-            "user": user.id,
-            "verdict": "AC",
-        }
-
-    def test_serialize_valid_data(self, submission_data):
-        assert CodeforcesSubmissionSerializer(data=submission_data).is_valid()
-
-    def test_user_is_required(self, submission_data):
-        serializer = CodeforcesSubmissionSerializer(
-            data=submission_data | {"user": None}
-        )
-        assert not serializer.is_valid()
-        err = serializer.errors["user"][0]
-        assert err == "This field may not be null."
-        assert err.code == "null"
-
-    def test_verdict_is_optional(self, submission_data):
-        serializer = CodeforcesSubmissionSerializer(
-            data=submission_data | {"verdict": None}
-        )
-        assert serializer.is_valid()
-
-    def test_invalid_verdict(self, submission_data):
-        serializer = CodeforcesSubmissionSerializer(
-            data=submission_data | {"verdict": "AAA"}
-        )
-        assert not serializer.is_valid()
-        err = serializer.errors["verdict"][0]
-        assert err == '"AAA" is not a valid choice.'
-        assert err.code == "invalid_choice"
-
-
-@pytest.mark.django_db
 class TestCodeforcesUserAPI:
     @pytest.fixture
     def client(self):
@@ -209,6 +161,7 @@ class TestCodeforcesSubmissionAPI:
         user.codeforcessubmission_set.create(
             contest_id=2,
             problem_index="A",
+            problem_rating=800,
             programming_language="Python",
             submission_id=3,
             verdict="AC",
@@ -216,6 +169,7 @@ class TestCodeforcesSubmissionAPI:
         user.codeforcessubmission_set.create(
             contest_id=2,
             problem_index="A",
+            problem_rating=800,
             programming_language="Python",
             submission_id=4,
             verdict="WA",
@@ -225,5 +179,8 @@ class TestCodeforcesSubmissionAPI:
         assert response.status_code == 200
         assert response.json() == {
             "solved_count": 2,
+            "-1000": 1,
+            "1000-1200": 0,
+            "1200-1400": 0,
             "total_count": 4,
         }

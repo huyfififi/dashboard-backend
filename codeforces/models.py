@@ -32,6 +32,7 @@ class CodeforcesSubmission(models.Model):
 
     contest_id = models.IntegerField()
     problem_index = models.CharField(max_length=2)
+    problem_rating = models.IntegerField(blank=True, null=True)
     programming_language = models.CharField(max_length=25)
     # codeforces submission id, auto-incremented
     submission_id = models.IntegerField(unique=True)

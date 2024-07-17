@@ -100,6 +100,8 @@ def retrieve_codeforces_user_submissions(
                 CodeforcesSubmission(
                     contest_id=submission["contestId"],
                     problem_index=submission["problem"]["index"],
+                    # rating is not present for contest submissions
+                    problem_rating=submission["problem"].get("rating"),
                     programming_language=submission["programmingLanguage"],
                     submission_id=submission["id"],
                     verdict=CodeforcesSubmission.VERDICT_CHOICES[submission["verdict"]],

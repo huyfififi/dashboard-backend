@@ -13,16 +13,3 @@ class CodeforcesUserSerializer(serializers.ModelSerializer):
             "last_updated",
         )
         model = CodeforcesUser
-
-
-class CodeforcesSubmissionSerializer(serializers.ModelSerializer):
-    class Meta:
-        fields = (
-            "contest_id",
-            "problem_index",
-            "programming_language",
-            "submission_id",
-            "verdict",
-            "user",
-        )
-        model = CodeforcesSubmission
