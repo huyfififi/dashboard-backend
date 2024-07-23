@@ -136,7 +136,10 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-CORS_ALLOWED_ORIGINS = ("http://localhost",)
+CORS_ALLOWED_ORIGINS = (
+    "http://localhost",
+    "http://localhost:3000",  # for testing purposes
+)
 
 # CELERY_* configurations will be translated by app.config_from_object()
 CELERY_BROKER_URL = "redis://:redis@message-queue:6379/0"
