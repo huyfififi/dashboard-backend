@@ -39,9 +39,8 @@ services:
     restart: always
     volumes:
       - .:/app
-    environment:
-      - SECRET_KEY=${SECRET_KEY}
-      - DEBUG=false
+    env_file:
+      - .env
     networks:
       - external_network
       - internal_network
