@@ -15,7 +15,8 @@ logger = logging.getLogger(__name__)
 @shared_task
 def retrieve_codeforces_user_info(handle: str = settings.CODEFORCES_HANDLE) -> None:
     request_url = f"https://codeforces.com/api/user.info?handles={handle}"
-    response = httpx.get(request_url)
+    # default timeout=5.0 is too short for Codeforces API
+    response = httpx.get(request_url, timeout=15.0)
     if response.status_code != 200:
         logger.error(
             "received an error response from codeforces. ",
@@ -27,7 +28,7 @@ def retrieve_codeforces_user_info(handle: str = settings.CODEFORCES_HANDLE) -> N
     time.sleep(3)
 
     request_url = f"https://codeforces.com/api/user.rating?handle={handle}"
-    response = httpx.get(request_url)
+    response = httpx.get(request_url, timeout=15.0)
     if response.status_code != 200:
         logger.error(
             "received an error response from codeforces. ",
@@ -73,10 +74,12 @@ def retrieve_codeforces_user_submissions(
     while not up_to_date:
         logger.info(f"fetching submissions for {handle} page: {page_i}")
         print(f"fetching submissions for {handle} page: {page_i}")
-        print(f"{up_to_date=}")
         response = httpx.get(
-            "https://codeforces.com/api/user.status?"
-            f"handle={handle}&from={page_i * BATCH_SIZE + 1}&count={BATCH_SIZE}"
+            (
+                "https://codeforces.com/api/user.status?"
+                f"handle={handle}&from={page_i * BATCH_SIZE + 1}&count={BATCH_SIZE}"
+            ),
+            timeout=15.0,
         )
         if response.status_code != 200:
             logger.error(
