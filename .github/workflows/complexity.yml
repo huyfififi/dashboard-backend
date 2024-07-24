@@ -1,0 +1,32 @@
+name: Check Cyclomatic Complexity
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout current repository
+      uses: actions/checkout@v4
+
+    - name: Checkout cyclon repository
+      uses: actions/checkout@v4
+      with:
+        repository: huyfififi/cyclon
+        path: cyclon
+
+    - name: Run cyclon
+      run: |
+        cd cyclon
+        # TODO: Add ignore files option to ignore cyclon itself
+        cargo run -- ../../dashboard-backend/codeforces
+        cargo run -- ../../dashboard-backend/dashboard
